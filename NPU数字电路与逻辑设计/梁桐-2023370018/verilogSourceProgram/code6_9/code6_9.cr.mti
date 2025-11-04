@@ -1,0 +1,8 @@
+C:/a111verilogcode/modelpro/code6_9/code6_9.v {1 {vlog -work work -stats=none C:/a111verilogcode/modelpro/code6_9/code6_9.v
+Model Technology ModelSim ALTERA vlog 10.3d Compiler 2014.10 Oct  7 2014
+-- Compiling module code6_9
+
+Top level modules:
+	code6_9
+
+} {} {}}

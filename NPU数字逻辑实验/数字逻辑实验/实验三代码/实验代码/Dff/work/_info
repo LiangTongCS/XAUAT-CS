@@ -1,0 +1,50 @@
+m255
+K4
+z2
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+dC:/modelsim/examples
+vdff
+Z0 VDg1SIo80bB@j0V0VzS_@n1
+r1
+!s85 0
+31
+!i10b 1
+!s100 Vm@Z[J@2`aF7I`[IkbIjX1
+I5Z:I0^[Rd9dklJj`0g^UL3
+Z1 dD:/Users/86180/Desktop/dff
+w1607685218
+8D:/Users/86180/Desktop/dff/dff.v
+FD:/Users/86180/Desktop/dff/dff.v
+L0 1
+Z2 OL;L;10.5;63
+Z3 !s108 1607685486.000000
+!s107 D:/Users/86180/Desktop/dff/dff.v|
+!s90 -reportprogress|300|-work|work|-vopt|-stats=none|D:/Users/86180/Desktop/dff/dff.v|
+!i113 0
+Z4 o-work work -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
+Z5 tCvgOpt 0
+vdff_tb
+R0
+r1
+!s85 0
+31
+!i10b 1
+!s100 38Qo3WnjF_VWKHNQ:Qa@G1
+Iz7bBNNUoE@JLVdmWzFH=V0
+R1
+w1607685427
+8D:/Users/86180/Desktop/dff/dff_tb.v
+FD:/Users/86180/Desktop/dff/dff_tb.v
+L0 2
+R2
+R3
+!s107 D:/Users/86180/Desktop/dff/dff_tb.v|
+!s90 -reportprogress|300|-work|work|-vopt|-stats=none|D:/Users/86180/Desktop/dff/dff_tb.v|
+!i113 0
+R4
+R5

@@ -1,0 +1,8 @@
+|code6_9
+Clock => y~1.DATAIN
+Resetn => y~3.DATAIN
+w1 => s.IN0
+w2 => s.IN1
+z <= z.DB_MAX_OUTPUT_PORT_TYPE
+
+

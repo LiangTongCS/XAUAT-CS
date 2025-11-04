@@ -1,0 +1,50 @@
+m255
+K4
+z2
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+dC:/altera/15.0/modelsim_ase/win32aloem
+vcode6_9
+Z0 !s110 1701691206
+!i10b 1
+!s100 1CHKR8z6LGznzjeIGPd]l1
+IAAj3bEo5iF;g<L_2OOY>R2
+Z1 V`JN@9S9cnhjKRR_L]QIcM3
+Z2 dC:/a111verilogcode/modelpro/code6_9
+w1701690939
+8C:/a111verilogcode/modelpro/code6_9/code6_9.v
+FC:/a111verilogcode/modelpro/code6_9/code6_9.v
+L0 1
+Z3 OV;L;10.3d;59
+r1
+!s85 0
+31
+!s108 1701691206.699000
+!s107 C:/a111verilogcode/modelpro/code6_9/code6_9.v|
+!s90 -reportprogress|300|-work|work|-stats=none|C:/a111verilogcode/modelpro/code6_9/code6_9.v|
+!i113 1
+Z4 o-work work
+vcode6_9_testbench
+R0
+!i10b 1
+!s100 DkQLk0RjXBRX^GB_[Mo770
+IYXY<R[<WQeX>`iNl8eYiV0
+R1
+R2
+w1701691055
+8C:/a111verilogcode/modelpro/code6_9/code6_9_testbench.v
+FC:/a111verilogcode/modelpro/code6_9/code6_9_testbench.v
+L0 3
+R3
+r1
+!s85 0
+31
+!s108 1701691206.766000
+!s107 C:/a111verilogcode/modelpro/code6_9/code6_9_testbench.v|
+!s90 -reportprogress|300|-work|work|-stats=none|C:/a111verilogcode/modelpro/code6_9/code6_9_testbench.v|
+!i113 1
+R4

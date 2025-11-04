@@ -1,0 +1,15 @@
+D:/Users/86180/Desktop/Timer/Timer.v {1 {vlog -work work -vopt -stats=none D:/Users/86180/Desktop/Timer/Timer.v
+Model Technology ModelSim SE-64 vlog 10.5 Compiler 2016.02 Feb 13 2016
+-- Compiling module Timer
+
+Top level modules:
+	Timer
+
+} {} {}} D:/Users/86180/Desktop/Timer/Timer_tb.v {1 {vlog -work work -vopt -stats=none D:/Users/86180/Desktop/Timer/Timer_tb.v
+Model Technology ModelSim SE-64 vlog 10.5 Compiler 2016.02 Feb 13 2016
+-- Compiling module Timer_tb
+
+Top level modules:
+	Timer_tb
+
+} {} {}}

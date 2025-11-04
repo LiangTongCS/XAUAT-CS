@@ -1,0 +1,297 @@
+任务三的目标是编写一个内核模块，该模块在加载时将打印当前系统中正在运行的进程的PID和名字。以下是实现该目标的基本步骤：
+
+1. **编写内核模块代码**：编写一个C文件，其中包含加载模块时执行的初始化函数和卸载模块时执行的清理函数。在初始化函数中，遍历系统中的每个进程，并打印其PID和名字。
+
+2. **编译内核模块**：编写一个Makefile文件，用于编译和加载内核模块。Makefile文件应包含适当的编译选项和目标，以便将源代码编译为内核模块。
+
+3. **加载模块**：使用`insmod`命令加载编译后的内核模块。加载模块后，模块的初始化函数将会执行，并输出当前正在运行的进程的PID和名字。
+
+4. **查看模块输出**：使用`dmesg`命令查看模块的输出，以查看当前正在运行的进程的PID和名字。
+
+下面是一个示例的内核模块代码：
+
+```c
+#include <linux/module.h>
+#include <linux/kernel.h>
+#include <linux/sched/signal.h>
+
+static int __init list_tasks_init(void) {
+    struct task_struct *task;
+    printk(KERN_INFO "Loading List Tasks Module\n");
+    for_each_process(task) {
+        if (task->state == TASK_RUNNING) {
+            printk(KERN_INFO "Process: %s [%d]\n", task->comm, task->pid);
+        }
+    }
+    return 0;
+}
+
+static void __exit list_tasks_exit(void) {
+    printk(KERN_INFO "Unloading List Tasks Module\n");
+}
+
+module_init(list_tasks_init);
+module_exit(list_tasks_exit);
+MODULE_LICENSE("GPL");
+```
+
+在这个示例中，`list_tasks_init` 函数遍历了系统中的每个进程，并检查每个进程的状态是否为 `TASK_RUNNING`，如果是，则打印其PID和名字。在加载模块时，这些信息将会输出到内核日志中。
+
+编译模块时，需要相应的Makefile文件，例如：
+
+```makefile
+obj-m += list_tasks.o
+
+all:
+	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) modules
+
+clean:
+	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) clean
+```
+
+使用以下命令编译模块：
+
+```
+make
+```
+
+然后加载模块：
+
+```
+sudo insmod list_tasks.ko
+```
+
+最后，使用 `dmesg` 命令查看模块的输出：
+
+```
+dmesg
+```
+
+这样就能够看到当前正在运行的进程的PID和名字了。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### 任务 3.4 使用 cgroup 实现限制 CPU 核数 - 让任务在指定的 CPU 核上运行
+
+### 3.4.1 相关知识
+#### 一、cgroup 介绍
+cgroup（Control Groups）是 Linux 内核功能，提供分组化管理进程的功能和接口基础结构。通过 cgroup，可以控制各种资源的使用，包括 CPU、内存、I/O 等。cgroup 子系统或控制器用于具体的资源管理。
+
+#### 二、tmpfs 文件系统
+tmpfs 是一种基于内存的文件系统。所有在 tmpfs 上存储的资料在理论上都是临时存放的，即资料不会建立在硬盘上，一旦重新启动，所有资料都会消失。tmpfs 速度快，可以动态分配文件系统大小。
+
+#### 三、相关命令
+- `mount`：加载指定的文件系统。
+- `echo`：显示文字或输出到文件。
+- `taskset`：设置或查询线程的 CPU 亲和性。
+- `cgexec`：在指定的 cgroup 中运行任务。
+
+### 3.4.2 实验步骤
+
+#### 步骤 1：安装 libcgroup
+```sh
+sudo dnf install libcgroup -y
+```
+libcgroup 包含 cgroup 用户空间工具套件及库。
+
+#### 步骤 2：挂载 tmpfs 格式的 cgroup 文件夹
+```sh
+sudo mkdir /cgroup
+sudo mount -t tmpfs tmpfs /cgroup
+cd /cgroup
+```
+tmpfs 是基于内存的文件系统，挂载后可用于创建 cgroup 层级结构。
+
+#### 步骤 3：挂载 cpuset 管理子系统
+```sh
+sudo mkdir cpuset
+sudo mount -t cgroup -o cpuset cpuset /cgroup/cpuset
+cd cpuset
+sudo mkdir mycpuset
+cd mycpuset
+```
+通过上述步骤挂载 cpuset 子系统并创建控制组 `mycpuset`。
+
+#### 步骤 4：设置 CPU 核数
+```sh
+echo 0 > cpuset.mems  # 设置 0 号内存节点
+echo 0-2 > cpuset.cpus  # 设置可使用的 CPU 核（0、1、2）
+cat cpuset.mems  # 确认设置
+cat cpuset.cpus  # 确认设置
+```
+确保 `cpuset.mems` 和 `cpuset.cpus` 都已正确设置。
+
+#### 步骤 5：新建一个目录，创建简单的死循环 C 源文件 `while_long.c`
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+int main(int argc, char *argv[]) {
+    while (1) {}
+    printf("Over");
+    exit(0);
+}
+```
+编译并运行此程序以进行测试。
+
+#### 步骤 6：测试验证
+1. **编译程序**
+    ```sh
+    gcc while_long.c -o while_long
+    ```
+
+2. **在 cpuset 控制组中运行程序**
+    ```sh
+    cgexec -g cpuset:mycpuset ./while_long
+    ```
+
+3. **查看程序 PID**
+    ```sh
+    top
+    ```
+    找到 `while_long` 的 PID（假设为 10127）。
+
+4. **查看和设置 CPU 亲和性**
+    ```sh
+    taskset -p 10127  # 查看当前 affinity mask
+    taskset -pc 10127  # 查看当前 affinity list
+    ```
+
+#### 解释结果
+- **affinity mask**：表示任务可以运行的 CPU 核心的位掩码。例如，affinity mask 为 7 表示 111（二进制），即任务可以在 CPU 核 0、1、2 上运行。
+- **affinity list**：列出了任务可以运行的 CPU 核心编号的列表。例如，affinity list 为 0-2 表示任务可以在 CPU 核 0、1、2 上运行。
+
+### 总结
+通过以上步骤，可以成功在指定的 CPU 核上运行任务，并通过 `taskset` 命令验证 CPU 亲和性是否设置正确。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+如果目录已经存在，可以跳过创建目录的步骤，直接挂载文件系统和子系统。请按以下步骤操作：
+
+1. **挂载 cgroup 文件系统：**
+
+   ```sh
+   sudo mount -t tmpfs none /cgroup
+   cd /cgroup
+   ```
+
+2. **创建并挂载 devices 子系统：**
+
+   ```sh
+   sudo mkdir -p devices
+   sudo mount -t cgroup -o devices none devices
+   cd devices
+   ```
+
+3. **创建 cgroup 控制组并设置拒绝访问 U 盘：**
+
+   ```sh
+   sudo mkdir mydevices
+   cd mydevices
+   ```
+
+4. **设置拒绝访问 U 盘：**
+
+   ```sh
+   echo 'b 8:16 rwm' | sudo tee devices.deny
+   ```
+
+   这条命令拒绝所有进程对主设备号为 `8` 和次设备号为 `16` 的块设备（即 U 盘）的读、写和 mknod 权限。
+
+5. **验证设置：**
+
+   通过尝试访问 U 盘来验证是否生效：
+
+   ```sh
+   sudo -i  # 切换到 root 用户
+   cd /usb
+   ls
+   ```
+
+   如果访问被拒绝，说明设置成功。
+
+6. **检查当前的 cgroup 设置：**
+
+   ```sh
+   cat devices.deny
+   ```
+
+   应该能看到类似 `b 8:16 rwm` 的条目。
+
+### 完整步骤示例
+
+1. **挂载 cgroup 文件系统：**
+
+   ```sh
+   sudo mount -t tmpfs none /cgroup
+   cd /cgroup
+   ```
+
+2. **创建并挂载 devices 子系统：**
+
+   ```sh
+   sudo mkdir -p devices
+   sudo mount -t cgroup -o devices none devices
+   cd devices
+   ```
+
+3. **创建 cgroup 控制组并设置拒绝访问 U 盘：**
+
+   ```sh
+   sudo mkdir mydevices
+   cd mydevices
+   ```
+
+4. **设置拒绝访问 U 盘：**
+
+   ```sh
+   echo 'b 8:16 rwm' | sudo tee devices.deny
+   ```
+
+5. **验证设置：**
+
+   ```sh
+   sudo -i  # 切换到 root 用户
+   cd /usb
+   ls
+   ```
+
+6. **检查当前的 cgroup 设置：**
+
+   ```sh
+   cat devices.deny
+   ```
+
+通过这些步骤，您应该能够成功使用 cgroup 来限制对 U 盘的访问。

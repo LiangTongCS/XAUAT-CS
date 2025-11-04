@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctoralStudents>
+	<studentInfo>
+		<studentNumber>202110001</studentNumber>
+		<studentName>张三</studentName>
+		<gander>男</gander>
+		<birthday>2000年05月16日</birthday>
+		<academy>软件学院</academy>
+		<major>计算机科学与技术</major>
+		<supervisor>马老师</supervisor>
+		<researchFields>人工智能</researchFields>
+	</studentInfo>
+	<studentInfo>
+		<studentNumber>202110002</studentNumber>
+		<studentName>李四</studentName>
+		<gander>女</gander>
+		<birthday>2001年02月26日</birthday>
+		<academy>软件学院</academy>
+		<major>计算机科学与技术</major>
+		<supervisor>马老师</supervisor>
+		<researchFields>大型工业软件</researchFields>
+	</studentInfo>
+</doctoralStudents>

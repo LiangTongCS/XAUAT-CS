@@ -1,0 +1,35 @@
+|shared
+a => a.IN1
+b => b.IN1
+c => c.IN1
+d => d.IN1
+m => m.IN2
+s1 <= adder:U3.port2
+s0 <= adder:U3.port3
+
+
+|shared|mux2to1:U1
+x1 => f.IN0
+x2 => f.IN0
+s => f.IN1
+s => f.IN1
+f <= f.DB_MAX_OUTPUT_PORT_TYPE
+
+
+|shared|mux2to1:U2
+x1 => f.IN0
+x2 => f.IN0
+s => f.IN1
+s => f.IN1
+f <= f.DB_MAX_OUTPUT_PORT_TYPE
+
+
+|shared|adder:U3
+a => s1.IN0
+a => s0.IN0
+b => s1.IN1
+b => s0.IN1
+s1 <= s1.DB_MAX_OUTPUT_PORT_TYPE
+s0 <= s0.DB_MAX_OUTPUT_PORT_TYPE
+
+

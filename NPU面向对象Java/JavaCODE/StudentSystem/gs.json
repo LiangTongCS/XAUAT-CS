@@ -1,0 +1,20 @@
+[
+	{
+		"academy": "软件学院",
+		"birthday": "2002年08月09日",
+		"gander": "女",
+		"major": "软件工程",
+		"studentName": "李四",
+		"studentNumber": "202120001",
+		"supervisor": "李老师"
+	},
+	{
+		"academy": "软件学院",
+		"birthday": "2002年09月29日",
+		"gander": "男",
+		"major": "软件工程",
+		"studentName": "张三",
+		"studentNumber": "202120002",
+		"supervisor": "赵老师"
+	}
+]

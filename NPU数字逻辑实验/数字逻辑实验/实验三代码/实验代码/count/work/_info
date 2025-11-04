@@ -1,0 +1,50 @@
+m255
+K4
+z2
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+dC:/modelsim/examples
+vcount
+Z0 VDg1SIo80bB@j0V0VzS_@n1
+r1
+!s85 0
+31
+!i10b 1
+!s100 1VkkUhlAdiB;30]O<7a^Q0
+InmV`VB_FQI9C0fjCmo9FD1
+Z1 dD:/Users/86180/Desktop/count
+w1607689578
+8D:/Users/86180/Desktop/count/count.v
+FD:/Users/86180/Desktop/count/count.v
+L0 1
+Z2 OL;L;10.5;63
+Z3 !s108 1607689760.000000
+!s107 D:/Users/86180/Desktop/count/count.v|
+!s90 -reportprogress|300|-work|work|-vopt|-stats=none|D:/Users/86180/Desktop/count/count.v|
+!i113 0
+Z4 o-work work -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
+Z5 tCvgOpt 0
+vcount_tb
+R0
+r1
+!s85 0
+31
+!i10b 1
+!s100 W:MT<V[CmbaTG>YogX1e20
+I8D^Q8X[iUD0[Ee3iZ<7eS0
+R1
+w1607689725
+8D:/Users/86180/Desktop/count/count_tb.v
+FD:/Users/86180/Desktop/count/count_tb.v
+L0 1
+R2
+R3
+!s107 D:/Users/86180/Desktop/count/count_tb.v|
+!s90 -reportprogress|300|-work|work|-vopt|-stats=none|D:/Users/86180/Desktop/count/count_tb.v|
+!i113 0
+R4
+R5
