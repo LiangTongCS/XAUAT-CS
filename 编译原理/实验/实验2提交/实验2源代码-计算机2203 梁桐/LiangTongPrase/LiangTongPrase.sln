@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34622.214
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LiangTongPrase", "LiangTongPrase.vcxproj", "{D33D90E1-8CAC-4540-A756-132F54BBA32A}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "LT语法分析", "..\LT语法分析\LT语法分析.vdproj", "{0C6E8D51-3935-4531-B485-EFA2EA51FB2F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D33D90E1-8CAC-4540-A756-132F54BBA32A}.Debug|x64.ActiveCfg = Debug|x64
+		{D33D90E1-8CAC-4540-A756-132F54BBA32A}.Debug|x64.Build.0 = Debug|x64
+		{D33D90E1-8CAC-4540-A756-132F54BBA32A}.Debug|x86.ActiveCfg = Debug|Win32
+		{D33D90E1-8CAC-4540-A756-132F54BBA32A}.Debug|x86.Build.0 = Debug|Win32
+		{D33D90E1-8CAC-4540-A756-132F54BBA32A}.Release|x64.ActiveCfg = Release|x64
+		{D33D90E1-8CAC-4540-A756-132F54BBA32A}.Release|x64.Build.0 = Release|x64
+		{D33D90E1-8CAC-4540-A756-132F54BBA32A}.Release|x86.ActiveCfg = Release|Win32
+		{D33D90E1-8CAC-4540-A756-132F54BBA32A}.Release|x86.Build.0 = Release|Win32
+		{0C6E8D51-3935-4531-B485-EFA2EA51FB2F}.Debug|x64.ActiveCfg = Debug
+		{0C6E8D51-3935-4531-B485-EFA2EA51FB2F}.Debug|x86.ActiveCfg = Debug
+		{0C6E8D51-3935-4531-B485-EFA2EA51FB2F}.Release|x64.ActiveCfg = Release
+		{0C6E8D51-3935-4531-B485-EFA2EA51FB2F}.Release|x86.ActiveCfg = Release
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A2DC10D7-A777-4436-A724-D00218C41AEA}
+	EndGlobalSection
+EndGlobal

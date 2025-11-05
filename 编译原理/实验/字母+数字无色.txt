@@ -1,0 +1,263 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+#include <map>
+#include <set>
+#include <stack>
+#include <iomanip>
+using namespace std;
+
+// 辅助函数
+inline bool isNonTerminal(const string &s) {
+    return !s.empty() && s[0] >= 'A' && s[0] <= 'Z';
+}
+inline bool isDigitChar(char c) { return c >= '0' && c <= '9'; }
+inline bool isLowerChar(char c) { return c >= 'a' && c <= 'z'; }
+inline bool isWhitespace(char c) { return c==' '||c=='\t'||c=='\n'||c=='\r'; }
+
+// 文法数据结构
+map<string, vector<vector<string>>> G;
+map<string, set<string>> FIRST, FOLLOW;
+map<string, map<string, vector<string>>> PREDICT;
+
+// 构造 FIRST 集
+void computeFirst() {
+    bool changed = true;
+    while (changed) {
+        changed = false;
+        for (auto &entry : G) {
+            const string &A = entry.first;
+            for (auto &prod : entry.second) {
+                bool canEps = true;
+                for (auto &X : prod) {
+                    if (isNonTerminal(X)) {
+                        for (auto &a : FIRST[X]) {
+                            if (a != "ε" && FIRST[A].insert(a).second) changed = true;
+                        }
+                        if (!FIRST[X].count("ε")) { canEps = false; break; }
+                    } else {
+                        if (X != "ε" && FIRST[A].insert(X).second) changed = true;
+                        canEps = false;
+                        break;
+                    }
+                }
+                if (canEps) {
+                    if (FIRST[A].insert("ε").second) changed = true;
+                }
+            }
+        }
+    }
+}
+
+// 构造 FOLLOW 集
+void computeFollow() {
+    FOLLOW["E"].insert("$");  // E 为起始符号
+    bool changed = true;
+    while (changed) {
+        changed = false;
+        for (auto &entry : G) {
+            const string &A = entry.first;
+            for (auto &prod : entry.second) {
+                for (size_t i = 0; i < prod.size(); ++i) {
+                    const string &B = prod[i];
+                    if (!isNonTerminal(B)) continue;
+                    bool canEps = true;
+                    for (size_t j = i + 1; j < prod.size(); ++j) {
+                        const string &beta = prod[j];
+                        if (isNonTerminal(beta)) {
+                            for (auto &a : FIRST[beta]) {
+                                if (a != "ε" && FOLLOW[B].insert(a).second) changed = true;
+                            }
+                            if (!FIRST[beta].count("ε")) { canEps = false; break; }
+                        } else {
+                            if (FOLLOW[B].insert(beta).second) changed = true;
+                            canEps = false;
+                            break;
+                        }
+                    }
+                    if (canEps) {
+                        for (auto &f : FOLLOW[A]) {
+                            if (FOLLOW[B].insert(f).second) changed = true;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+// 构造预测分析表
+void buildPredictTable() {
+    for (auto &entry : G) {
+        const string &A = entry.first;
+        PREDICT[A].clear();
+        for (auto &prod : entry.second) {
+            bool prodEps = (prod.size()==1 && prod[0]=="ε");
+            set<string> firstAlpha;
+            bool canEps = true;
+            if (!prodEps) {
+                for (auto &X : prod) {
+                    if (isNonTerminal(X)) {
+                        for (auto &a : FIRST[X]) {
+                            if (a != "ε") firstAlpha.insert(a);
+                        }
+                        if (!FIRST[X].count("ε")) { canEps = false; break; }
+                    } else {
+                        firstAlpha.insert(X);
+                        canEps = false;
+                        break;
+                    }
+                }
+            }
+            // 填 FIRST(alpha)
+            for (auto &a : firstAlpha) {
+                PREDICT[A][a] = prod;
+            }
+            // 填 FOLLOW(A) 对应的表项
+            if (prodEps || canEps) {
+                for (auto &b : FOLLOW[A]) {
+                    PREDICT[A][b] = prod;
+                }
+            }
+        }
+    }
+}
+
+// 打印 FIRST 和 FOLLOW 集
+void printFirstFollow() {
+    cout << "\n== FIRST 集 ==\n";
+    for (auto &entry : FIRST) {
+        cout << entry.first << ": { ";
+        for (auto &a : entry.second) cout << a << ' ';
+        cout << "}\n";
+    }
+    cout << "\n== FOLLOW 集 ==\n";
+    for (auto &entry : FOLLOW) {
+        cout << entry.first << ": { ";
+        for (auto &a : entry.second) cout << a << ' ';
+        cout << "}\n";
+    }
+}
+
+// 语法分析过程
+void parse(const string &input) {
+    stack<string> st;
+    st.push("$"); st.push("E");
+    vector<string> tokens;
+    // 分词
+    for (size_t i=0; i<input.size();) {
+        if (isWhitespace(input[i])) { ++i; continue; }
+        if (isDigitChar(input[i])) {
+            tokens.push_back("num");
+            while (i<input.size() && isDigitChar(input[i])) ++i;
+        } else if (isLowerChar(input[i])) {
+            tokens.push_back("id"); ++i;
+        } else {
+            tokens.push_back(string(1,input[i])); ++i;
+        }
+    }
+    if (tokens.empty() || tokens.back()!="$") tokens.push_back("$");
+
+    // 打印表头
+    cout << left << setw(10) << "栈顶" << " | "
+         << right << setw(20) << "剩余输入" << " | "
+         << right << setw(10) << "动作" << "\n";
+    cout << string(10,'-') << "-+-" << string(20,'-') << "-+-" << string(10,'-') << "\n";
+
+    size_t idx = 0;
+    while (!st.empty()) {
+        string X = st.top(); st.pop();
+        // 接受条件
+        if (X=="$" && idx<tokens.size() && tokens[idx]=="$") {
+            cout << left << setw(10) << "" << " | "
+                 << right << setw(20) << "" << " | "
+                 << right << setw(10) << "接受" << "\n";
+            return;
+        }
+        // 打印栈顶与剩余输入
+        string rem;
+        for (size_t j=idx; j<tokens.size(); ++j) rem += tokens[j];
+        cout << left << setw(10) << X << " | "
+             << right << setw(20) << rem << " | ";
+        // 若 X 是终结符
+        if (!isNonTerminal(X)) {
+            if (idx<tokens.size() && tokens[idx]==X) {
+                cout << right << setw(10) << "匹配" << "\n";
+                ++idx;
+                continue;
+            } else {
+                cout << right << setw(10) << "错误" << "\n";
+                return;
+            }
+        }
+        // X 是非终结符
+        string a = (idx<tokens.size() ? tokens[idx] : "");
+        if (PREDICT[X].count(a)) {
+            auto prod = PREDICT[X][a];
+            string act = X + "->";
+            for (auto &s : prod) act += s;
+            cout << right << setw(10) << act << "\n";
+            for (auto it = prod.rbegin(); it!=prod.rend(); ++it) {
+                if (*it != "ε") st.push(*it);
+            }
+        } else {
+            cout << right << setw(10) << "表项空" << "\n";
+            return;
+        }
+    }
+}
+
+int main() {
+    // 初始化文法
+    G["E"]  = {{"T","E'"}};
+    G["E'"] = {{"+","T","E'"},{"ε"}};
+    G["T"]  = {{"F","T'"}};
+    G["T'"] = {{"*","F","T'"},{"ε"}};
+    G["F"]  = {{"(","E",")"},{"num"},{"id"}};
+
+    computeFirst();
+    computeFollow();
+    buildPredictTable();
+    printFirstFollow();
+
+    // 模式说明
+    cout << "输入模式说明:\n"
+         << "1. 命令行模式: 表达式可包含 +,*,(),num,id,$; 示例: a+num*(b+c)$\n"
+         << "2. 文件模式: 指定 txt 文件，每行一个表达式，自动补全 $。\n";
+    cout << "请选择模式(1-命令行, 2-文件): ";
+    int mode; cin >> mode;
+
+    if (mode == 1) {
+        int cont = 1;
+        string inp;
+        while (cont == 1) {
+            cout << "\n输入要求：+ * ( ) num id 以及 $; 示例 a+num*(b+3)$\n";
+            cout << "请输入表达式: ";
+            cin >> ws;
+            getline(cin, inp);
+            if (!inp.empty() && inp.back()!='$') inp.push_back('$');
+            parse(inp);
+            cout << "是否继续? (1-继续,0-退出): ";
+            cin >> cont;
+        }
+    } else {
+        cout << "\n请输入文件名: ";
+        string fname; cin >> fname;
+        ifstream ifs(fname);
+        if (!ifs) {
+            cerr << "无法打开文件: " << fname << endl;
+            return 1;
+        }
+        string line;
+        int lineno = 1;
+        while (getline(ifs, line)) {
+            if (line.empty()) { ++lineno; continue; }
+            if (line.back()!='$') line.push_back('$');
+            cout << "\n-- 第 " << lineno << " 行分析 --\n";
+            parse(line);
+            ++lineno;
+        }
+    }
+    return 0;
+}
