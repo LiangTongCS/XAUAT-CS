@@ -1,0 +1,147 @@
+MODE    EQU   80H          ; 8255 工作方式
+PA8255  EQU   8000H        ; 8255 PA口输出地址
+CTL8255 EQU   8006H
+
+TCONTRO   EQU 0A006H
+TCON0     EQU 0A000H
+TCON1     EQU 0A002H
+TCON2     EQU 0A004H
+
+ICW1    EQU   00010011B     ; 单片8259, 上升沿中断, 要写ICW4
+ICW2    EQU   00100000B     ; 中断号为20H
+ICW4    EQU   00000001B     ; 工作在8086/88 方式
+OCW1    EQU   00000000B     ; 只响应INT0 中断
+CS8259A EQU   0C000H        ; 8259地址
+CS8259B EQU   0C002H
+
+
+CODE   SEGMENT
+       ASSUME CS:CODE, DS: DATA,SS:STACK
+
+ORG 800H
+       
+START:
+        MOV AX, DATA
+        MOV DS, AX
+
+        MOV AX, STACK
+        MOV SS, AX
+
+        MOV AX, TOP
+        MOV SP, AX
+        
+       MOV   DX, CTL8255
+       MOV   AL, MODE
+       OUT   DX, AL
+	
+	 MOV DX,TCONTRO
+          MOV AL,036H  ;计数器0，只写计算值低8位，方式3，二进制计数
+          OUT DX,AL
+          MOV DX,TCON0
+          MOV AX,62500   ;时钟为1MHZ ，计数时间=1us*20 =20 us  输出频率50KHZ
+          OUT DX,AL
+	  MOV AL,AH
+	  OUT DX,AL
+       CLI
+       PUSH  DS
+       
+       MOV   AX ,0
+       MOV   DS ,AX
+       MOV   BX, 128 ;0X20 * 4  中断号
+
+       MOV   AX, CODE
+       MOV   CL, 4
+       SHL   AX, CL               ; X 16
+       ADD   AX, OFFSET IENTER   ; 中断入口地址（段地址为0）
+       MOV   [BX], AX
+
+       MOV   AX, 0
+       INC   BX
+       INC   BX
+       MOV   [BX], AX            ; 代码段地址为0
+       
+       POP DS
+       CALL  IINIT
+             
+
+       ;STI
+	MOV  BX,OFFSET DENG 
+	MOV AL,FLG
+	XLAT  
+	MOV DX,PA8255
+	OUT DX,AL
+
+LP:       STI
+                              ; 等待中断，并计数。
+       NOP
+       JMP   LP
+IINIT:
+       MOV   DX, CS8259A
+       MOV   AL, ICW1
+       OUT   DX, AL
+
+       MOV   DX, CS8259B
+       MOV   AL, ICW2
+       OUT   DX, AL
+
+       MOV   AL, ICW4
+       OUT   DX, AL
+
+       MOV   AL, OCW1
+       OUT   DX, AL
+       RET     
+ 
+IENTER:
+       CLI
+       
+       INC   CNT
+
+       MOV AL,CNT      ;10
+       CMP AL,2
+       JA  LP1
+       MOV  FLG,0
+       JMP  TT
+LP1:	MOV AL,CNT       ; 70
+        CMP  AL,7
+	JA  LP2
+	MOV FLG,1
+	JMP  TT
+LP2:	MOV AL,CNT       ;80
+	 CMP AL,9
+	 JA LP3
+	MOV FLG,0
+	 JMP TT
+LP3:	MOV AL, CNT      ;200
+	 CMP AL,12
+	 JA LP4
+	 MOV FLG,2
+	 JMP TT
+LP4:	 MOV FLG,0
+	 MOV CNT,0
+	 
+TT:	 MOV  BX,OFFSET DENG 
+	MOV AL,FLG
+	XLAT  
+	MOV DX,PA8255
+	OUT DX,AL
+	
+       
+       MOV   DX, CS8259A
+       MOV   AL, 20H         ; 中断服务程序结束指令
+       OUT   DX, AL
+       ;STI
+       IRET
+       
+CODE   ENDS
+
+
+DATA   SEGMENT
+CNT    DB    0H
+FLG    DB   0H
+DENG    DB   0BDH,7EH,0DBH
+DATA   ENDS
+STACK   SEGMENT 'STACK'
+STA     DB  100 DUP(?)
+TOP     EQU LENGTH STA
+STACK   ENDS
+       END START

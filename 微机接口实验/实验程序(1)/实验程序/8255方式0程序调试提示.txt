@@ -1,0 +1,18 @@
+       
+CODE    SEGMENT PUBLIC 'CODE'
+        ASSUME CS:CODE
+
+START:   MOV DX,8006H
+         MOV AL,82H
+	 OUT DX,AL
+	 
+LP:     MOV DX,8002H
+        IN AL,DX
+	MOV DX,8000H
+	OUT  DX,AL
+	JMP  LP
+        ; Write your code here
+ENDLESS:
+        JMP ENDLESS
+CODE    ENDS
+        END START

@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34622.214
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vedioSystem", "vedioSystem.vcxproj", "{29E3BB9C-4815-4F37-A732-E2BCF43FC921}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "梁桐录像带进销存管理系统", "..\梁桐录像带进销存管理系统\梁桐录像带进销存管理系统.vdproj", "{5D7234D2-585F-4E25-BE54-9F50064547A8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{29E3BB9C-4815-4F37-A732-E2BCF43FC921}.Debug|x64.ActiveCfg = Debug|x64
+		{29E3BB9C-4815-4F37-A732-E2BCF43FC921}.Debug|x64.Build.0 = Debug|x64
+		{29E3BB9C-4815-4F37-A732-E2BCF43FC921}.Debug|x86.ActiveCfg = Debug|Win32
+		{29E3BB9C-4815-4F37-A732-E2BCF43FC921}.Debug|x86.Build.0 = Debug|Win32
+		{29E3BB9C-4815-4F37-A732-E2BCF43FC921}.Release|x64.ActiveCfg = Release|x64
+		{29E3BB9C-4815-4F37-A732-E2BCF43FC921}.Release|x64.Build.0 = Release|x64
+		{29E3BB9C-4815-4F37-A732-E2BCF43FC921}.Release|x86.ActiveCfg = Release|Win32
+		{29E3BB9C-4815-4F37-A732-E2BCF43FC921}.Release|x86.Build.0 = Release|Win32
+		{5D7234D2-585F-4E25-BE54-9F50064547A8}.Debug|x64.ActiveCfg = Debug
+		{5D7234D2-585F-4E25-BE54-9F50064547A8}.Debug|x86.ActiveCfg = Debug
+		{5D7234D2-585F-4E25-BE54-9F50064547A8}.Release|x64.ActiveCfg = Release
+		{5D7234D2-585F-4E25-BE54-9F50064547A8}.Release|x86.ActiveCfg = Release
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {CFBD3093-9119-4503-BEBF-81215F1AEAAD}
+	EndGlobalSection
+EndGlobal

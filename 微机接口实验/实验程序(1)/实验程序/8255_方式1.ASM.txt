@@ -1,0 +1,100 @@
+MODE    EQU   80H          ; 8255 工作方式
+PA8255  EQU   8000H        ; 8255 PA口输出地址
+CTL8255 EQU   8006H
+
+ICW1    EQU   00010011B     ; 单片8259, 上升沿中断, 要写ICW4
+ICW2    EQU   00100000B     ; 中断号为20H
+ICW4    EQU   00000001B     ; 工作在8086/88 方式
+OCW1    EQU   00000000B     ; 只响应INT0 中断
+CS8259A EQU   0C000H        ; 8259地址
+CS8259B EQU   0C002H
+
+
+CODE   SEGMENT
+       ASSUME CS:CODE, DS: DATA,SS:STACK
+
+ORG 800H
+       
+START:
+        MOV AX, DATA
+        MOV DS, AX
+
+        MOV AX, STACK
+        MOV SS, AX
+
+        MOV AX, TOP
+        MOV SP, AX
+        
+        MOV DX,8006H
+         MOV AL,86H
+	 OUT DX,AL
+	 MOV AL,5H
+	 OUT DX,AL
+	
+       CLI
+       PUSH  DS
+       
+       MOV   AX ,0
+       MOV   DS ,AX
+       MOV   BX, 128 ;0X20 * 4  中断号
+
+       MOV   AX, CODE
+       MOV   CL, 4
+       SHL   AX, CL               ; X 16
+       ADD   AX, OFFSET IENTER   ; 中断入口地址（段地址为0）
+       MOV   [BX], AX
+
+       MOV   AX, 0
+       INC   BX
+       INC   BX
+       MOV   [BX], AX            ; 代码段地址为0
+       
+       POP DS
+       CALL  IINIT
+             
+       MOV   AL, CNT  ; 计数值初始为0
+       MOV   DX, PA8255
+       OUT   DX, AL
+       STI
+LP:                              ; 等待中断，并计数。
+       NOP
+       JMP   LP
+IINIT:
+       MOV   DX, CS8259A
+       MOV   AL, ICW1
+       OUT   DX, AL
+
+       MOV   DX, CS8259B
+       MOV   AL, ICW2
+       OUT   DX, AL
+
+       MOV   AL, ICW4
+       OUT   DX, AL
+
+       MOV   AL, OCW1
+       OUT   DX, AL
+       RET     
+ 
+IENTER:
+       CLI
+        MOV DX,8002H
+        IN AL,DX
+	MOV DX,8000H
+	OUT  DX,AL
+
+       MOV   DX, CS8259A
+       MOV   AL, 20H         ; 中断服务程序结束指令
+       OUT   DX, AL
+       STI
+       IRET
+       
+CODE   ENDS
+
+DATA   SEGMENT
+CNT    DB    0
+DATA   ENDS
+STACK   SEGMENT 'STACK'
+STA     DB  100 DUP(?)
+TOP     EQU LENGTH STA
+STACK   ENDS
+       END START
