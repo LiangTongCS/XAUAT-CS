@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>登录 - AI简历分析系统</title>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      body {
+        background: linear-gradient(120deg, #ffd6e0 0%, #ffe3f3 100%);
+      }
+      .auth-container {
+        display: flex;
+        flex-direction: column;
+        width: 400px;
+        margin: 100px auto;
+        padding: 36px;
+        background: #fff0f6;
+        border-radius: 32px;
+        box-shadow: 0 4px 32px rgba(255, 182, 193, 0.18);
+      }
+      .auth-tabs {
+        display: flex;
+        margin-bottom: 24px;
+        border-bottom: 2px solid #ffb6c1;
+        border-radius: 18px 18px 0 0;
+        background: #ffe3f3;
+      }
+      .auth-tab {
+        flex: 1;
+        text-align: center;
+        padding: 14px;
+        cursor: pointer;
+        font-weight: bold;
+        color: #ff69b4;
+        font-size: 1.1rem;
+        border-radius: 18px 18px 0 0;
+        transition: all 0.3s;
+      }
+      .auth-tab.active {
+        color: #fff;
+        background: linear-gradient(90deg, #ffb6c1 0%, #ff69b4 100%);
+        border-bottom: 3px solid #ff69b4;
+      }
+      .auth-form {
+        display: none;
+      }
+      .auth-form.active {
+        display: block;
+      }
+      .form-group {
+        margin-bottom: 22px;
+      }
+      .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: bold;
+        color: #ff69b4;
+        font-size: 1rem;
+      }
+      .form-group input {
+        width: 100%;
+        padding: 14px;
+        border: 1.5px solid #ffb6c1;
+        border-radius: 18px;
+        font-size: 1.08rem;
+        background: #fff0f6;
+        transition: border 0.2s, box-shadow 0.2s;
+      }
+      .form-group input:focus {
+        border-color: #ff69b4;
+        outline: none;
+        box-shadow: 0 0 8px rgba(255, 182, 193, 0.18);
+      }
+      .switch-link {
+        text-align: center;
+        margin-top: 15px;
+        color: #ff69b4;
+        cursor: pointer;
+        font-size: 14px;
+      }
+      .switch-link:hover {
+        text-decoration: underline;
+      }
+      .error-message {
+        color: #e74c3c;
+        font-size: 14px;
+        margin-top: 5px;
+        display: none;
+      }
+      .forgot-password a {
+        color: #ff69b4;
+        text-decoration: underline;
+        font-size: 14px;
+      }
+      .forgot-password a:hover {
+        color: #ffb6c1;
+      }
+      .action-button {
+        width: 100%;
+        padding: 14px;
+        border: none;
+        border-radius: 24px;
+        background: linear-gradient(90deg, #ffb6c1 0%, #ff69b4 100%);
+        color: #fff;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(255, 182, 193, 0.18);
+        margin-top: 8px;
+        margin-bottom: 8px;
+        transition: background 0.2s, box-shadow 0.2s;
+      }
+      .action-button:hover {
+        background: linear-gradient(90deg, #ff69b4 0%, #ffb6c1 100%);
+        box-shadow: 0 4px 16px rgba(255, 182, 193, 0.22);
+      }
+      .password-strength {
+        height: 6px;
+        background: #ffe3f3;
+        border-radius: 3px;
+        margin-top: 7px;
+        overflow: hidden;
+      }
+      .password-strength-bar {
+        height: 100%;
+        width: 0%;
+        background: #ff69b4;
+        transition: width 0.3s;
+        border-radius: 3px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="auth-container">
+      <div class="auth-tabs">
+        <div class="auth-tab active" data-tab="login">登录</div>
+        <div class="auth-tab" data-tab="register">注册</div>
+      </div>
+
+      <!-- 登录表单 -->
+      <form id="loginForm" class="auth-form active">
+        <div class="form-group">
+          <label for="loginUsername">用户名</label>
+          <input type="text" id="loginUsername" required />
+        </div>
+        <div class="form-group">
+          <!--            <label for="loginPassword">密码</label>-->
+          <!--            <input type="password" id="loginPassword" required>-->
+          <label for="loginPassword">密码</label>
+          <div style="position: relative">
+            <input type="password" id="loginPassword" required />
+            <span
+              id="togglePassword"
+              style="
+                position: absolute;
+                right: 10px;
+                top: 50%;
+                transform: translateY(-50%);
+                cursor: pointer;
+              "
+              >👁️</span
+            >
+          </div>
+        </div>
+        <div class="error-message" id="loginError"></div>
+        <button type="submit" class="action-button">登录</button>
+        <div class="forgot-password">
+          <a href="#" id="forgotPasswordLink">忘记密码?</a>
+        </div>
+      </form>
+
+      <!-- 注册表单 -->
+      <form id="registerForm" class="auth-form">
+        <div class="form-group">
+          <label for="registerName">姓名</label>
+          <input type="text" id="registerName" required />
+        </div>
+        <div class="form-group">
+          <label for="registerUsername">用户名</label>
+          <input type="text" id="registerUsername" required />
+          <div class="error-message" id="usernameError"></div>
+        </div>
+        <div class="form-group">
+          <label for="registerPassword">密码</label>
+          <input type="password" id="registerPassword" required />
+          <div class="password-strength">
+            <div class="password-strength-bar" id="passwordStrengthBar"></div>
+          </div>
+          <div class="error-message" id="passwordError"></div>
+        </div>
+        <div class="form-group">
+          <label for="registerConfirmPassword">确认密码</label>
+          <input type="password" id="registerConfirmPassword" required />
+          <div class="error-message" id="confirmPasswordError"></div>
+        </div>
+        <button type="submit" class="action-button">注册</button>
+      </form>
+    </div>
+
+    <script>
+      // 切换登录/注册表单
+      document.querySelectorAll(".auth-tab").forEach((tab) => {
+        tab.addEventListener("click", function () {
+          const tabId = this.getAttribute("data-tab");
+
+          // 更新标签状态
+          document.querySelectorAll(".auth-tab").forEach((t) => {
+            t.classList.remove("active");
+          });
+          this.classList.add("active");
+
+          // 显示对应表单
+          document.querySelectorAll(".auth-form").forEach((form) => {
+            form.classList.remove("active");
+          });
+          document.getElementById(`${tabId}Form`).classList.add("active");
+
+          // 清除错误信息
+          document.querySelectorAll(".error-message").forEach((el) => {
+            el.style.display = "none";
+          });
+        });
+      });
+
+      // 切换密码可见性
+      document
+        .getElementById("togglePassword")
+        .addEventListener("click", function () {
+          const passwordInput = document.getElementById("loginPassword");
+          if (passwordInput.type === "password") {
+            passwordInput.type = "text";
+            this.textContent = "👁";
+          } else {
+            passwordInput.type = "password";
+            this.textContent = "👁";
+          }
+        });
+
+      // 密码强度检测
+      document
+        .getElementById("registerPassword")
+        .addEventListener("input", function () {
+          const password = this.value;
+          const strengthBar = document.getElementById("passwordStrengthBar");
+          let strength = 0;
+
+          if (password.length > 0) strength += 20;
+          if (password.length >= 6) strength += 20;
+          if (/[A-Z]/.test(password)) strength += 20;
+          if (/[0-9]/.test(password)) strength += 20;
+          if (/[^A-Za-z0-9]/.test(password)) strength += 20;
+
+          strengthBar.style.width = `${strength}%`;
+
+          // 更新颜色
+          if (strength < 40) {
+            strengthBar.style.backgroundColor = "#e74c3c";
+          } else if (strength < 80) {
+            strengthBar.style.backgroundColor = "#f39c12";
+          } else {
+            strengthBar.style.backgroundColor = "#2ecc71";
+          }
+        });
+
+      // 登录表单提交
+      document
+        .getElementById("loginForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+
+          const username = document.getElementById("loginUsername").value;
+          const password = document.getElementById("loginPassword").value;
+
+          try {
+            const response = await fetch("http://localhost:8080/login", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ username, password }),
+            });
+
+            if (response.ok) {
+              const result = await response.json();
+              // 保存token到localStorage
+              localStorage.setItem("token", result.token);
+              // 跳转到主界面
+              window.location.href = "index.html";
+            } else {
+              const error = await response.text();
+              showError("loginError", error);
+            }
+          } catch (error) {
+            showError("loginError", "登录请求失败");
+            console.error(error);
+          }
+        });
+
+      document
+        .getElementById("forgotPasswordLink")
+        .addEventListener("click", function (e) {
+          e.preventDefault();
+          alert("请联系管理员重置密码");
+        });
+
+      // 注册表单提交
+      document
+        .getElementById("registerForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+
+          // 清除所有错误信息
+          document.querySelectorAll(".error-message").forEach((el) => {
+            el.style.display = "none";
+          });
+
+          const name = document.getElementById("registerName").value;
+          const username = document.getElementById("registerUsername").value;
+          const password = document.getElementById("registerPassword").value;
+          const confirmPassword = document.getElementById(
+            "registerConfirmPassword"
+          ).value;
+
+          // 表单验证
+          let isValid = true;
+
+          if (name.trim().length === 0) {
+            showError("usernameError", "请输入姓名");
+            isValid = false;
+          }
+
+          if (username.trim().length === 0) {
+            showError("usernameError", "请输入用户名");
+            isValid = false;
+          } else if (username.length < 4) {
+            showError("usernameError", "用户名至少需要4个字符");
+            isValid = false;
+          }
+
+          if (password.length === 0) {
+            showError("passwordError", "请输入密码");
+            isValid = false;
+          } else if (password.length < 6) {
+            showError("passwordError", "密码至少需要6个字符");
+            isValid = false;
+          }
+
+          if (confirmPassword !== password) {
+            showError("confirmPasswordError", "两次输入的密码不一致");
+            isValid = false;
+          }
+
+          if (!isValid) return;
+
+          try {
+            const response = await fetch("http://localhost:8080/register", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ name, username, password }),
+            });
+
+            if (response.ok) {
+              const result = await response.json();
+              // 保存token到localStorage
+              localStorage.setItem("token", result.token);
+              // 跳转到主界面
+              window.location.href = "index.html";
+            } else {
+              const error = await response.text();
+              showError("usernameError", error);
+            }
+          } catch (error) {
+            showError("usernameError", "注册请求失败");
+            console.error(error);
+          }
+        });
+
+      // 显示错误信息
+      function showError(elementId, message) {
+        const errorElement = document.getElementById(elementId);
+        errorElement.textContent = message;
+        errorElement.style.display = "block";
+      }
+    </script>
+  </body>
+</html>

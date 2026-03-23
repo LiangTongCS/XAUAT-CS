@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>AI简历分析助手</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="wait.css" />
+    <style>
+      body {
+        background: linear-gradient(120deg, #ffd6e0 0%, #ffe3f3 100%);
+      }
+      .modern-navbar {
+        background: linear-gradient(90deg, #ffb6c1 0%, #ff69b4 100%);
+        padding: 22px 0;
+        box-shadow: 0 4px 16px rgba(255, 182, 193, 0.16);
+        border-radius: 0 0 32px 32px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .modern-logo {
+        color: #fff;
+        font-size: 2.2rem;
+        font-weight: 700;
+        letter-spacing: 2px;
+      }
+      .modern-user-info {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+      }
+      .modern-user-info span {
+        color: #fff;
+        font-weight: 500;
+        font-size: 1.1rem;
+      }
+      .modern-action-btn,
+      .modern-logout-btn {
+        padding: 10px 22px;
+        border: none;
+        border-radius: 24px;
+        background: linear-gradient(90deg, #ffb6c1 0%, #ff69b4 100%);
+        color: #fff;
+        font-weight: 600;
+        box-shadow: 0 2px 8px rgba(255, 182, 193, 0.18);
+        transition: background 0.2s, box-shadow 0.2s;
+        cursor: pointer;
+      }
+      .modern-action-btn:hover,
+      .modern-logout-btn:hover {
+        background: linear-gradient(90deg, #ff69b4 0%, #ffb6c1 100%);
+        box-shadow: 0 4px 16px rgba(255, 182, 193, 0.22);
+      }
+      .modern-chat-container {
+        background: #fff0f6;
+        border-radius: 32px;
+        box-shadow: 0 4px 32px rgba(255, 182, 193, 0.18);
+        margin: 32px auto;
+        padding: 32px 24px;
+        max-width: 1200px;
+      }
+      .modern-chat-input {
+        display: flex;
+        gap: 12px;
+        margin-top: 18px;
+      }
+      .modern-input {
+        padding: 14px;
+        border: 1.5px solid #ffb6c1;
+        border-radius: 18px;
+        font-size: 1.08rem;
+        background: #fff0f6;
+        transition: border 0.2s, box-shadow 0.2s;
+      }
+      .modern-input:focus {
+        border-color: #ff69b4;
+        box-shadow: 0 0 8px rgba(255, 182, 193, 0.18);
+        outline: none;
+      }
+      .modern-btn {
+        padding: 10px 22px;
+        border: none;
+        border-radius: 24px;
+        background: linear-gradient(90deg, #ffb6c1 0%, #ff69b4 100%);
+        color: #fff;
+        font-weight: 600;
+        box-shadow: 0 2px 8px rgba(255, 182, 193, 0.18);
+        transition: background 0.2s, box-shadow 0.2s;
+        cursor: pointer;
+      }
+      .modern-btn:hover {
+        background: linear-gradient(90deg, #ff69b4 0%, #ffb6c1 100%);
+        box-shadow: 0 4px 16px rgba(255, 182, 193, 0.22);
+      }
+      .modern-sidebar {
+        background: #ffe3f3;
+        border-radius: 32px 0 0 32px;
+        box-shadow: 0 2px 12px rgba(255, 182, 193, 0.12);
+      }
+      .modern-sidebar-header h3 {
+        color: #ff69b4;
+        font-weight: 700;
+      }
+      .modern-search-box {
+        margin-bottom: 12px;
+      }
+      .modern-history-list {
+        background: #fff0f6;
+        border-radius: 18px;
+        padding: 8px;
+      }
+    </style>
+
+    <!--    markdown.css 样式文件-->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/github-dark.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.1.0/github-markdown-dark.min.css"
+    />
+  </head>
+  <body>
+    <!-- 现代风格历史对话侧边栏 -->
+    <aside class="modern-sidebar" id="historySidebar">
+      <div class="modern-sidebar-header">
+        <h3>历史对话</h3>
+        <button id="toggleSidebar" class="modern-toggle-btn">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+      <div class="modern-search-box">
+        <input
+          type="text"
+          id="historySearch"
+          placeholder="搜索历史对话..."
+          class="modern-input"
+        />
+        <button id="searchButton" class="modern-btn">
+          <i class="fas fa-search"></i>搜索
+        </button>
+      </div>
+      <div class="modern-history-list" id="historyList">
+        <!-- 历史对话将通过JS动态填充 -->
+      </div>
+    </aside>
+    <!-- 现代主聊天区域 -->
+    <main class="modern-chat-container">
+      <!-- 顶部导航栏 -->
+      <nav class="modern-navbar">
+        <button id="toggleHistory" class="modern-toggle-btn">
+          <i class="fas fa-history"></i> 历史对话
+        </button>
+        <div class="modern-logo">AI简历分析助手</div>
+        <!-- AI服务选择器 -->
+        <div class="modern-ai-service-selector">
+          <label for="aiService" class="modern-label">AI服务:</label>
+          <select
+            id="aiService"
+            onchange="setAIService()"
+            class="modern-select"
+          >
+            <option value="deepseek">DeepSeek</option>
+            <option value="wenxin">文心一言</option>
+          </select>
+        </div>
+        <div class="modern-user-info">
+          <span id="usernameDisplay">用户</span>
+          <button id="userManagementBtn" class="modern-action-btn">
+            用户管理
+          </button>
+          <button id="logoutBtn" class="modern-logout-btn">退出</button>
+        </div>
+      </nav>
+
+      <section class="modern-chat-messages" id="chatMessages">
+        <!-- 消息将动态添加到这里 -->
+      </section>
+      <!-- 输入区域 -->
+      <section class="modern-chat-input">
+        <input
+          type="file"
+          id="resumeUpload"
+          accept=".pdf,.doc,.docx"
+          class="modern-input"
+        />
+        <input
+          type="text"
+          id="messageInput"
+          placeholder="输入消息..."
+          class="modern-input"
+        />
+        <button onclick="sendMessage()" class="modern-btn">发送</button>
+        <button onclick="uploadResume()" class="modern-btn">上传简历</button>
+      </section>
+    </main>
+    <script src="script.js"></script>
+    <!--markdown.js 脚本文件-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.0.2/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/languages/python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/languages/java.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/languages/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/languages/xml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/languages/css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/languages/shell.min.js"></script>
+
+    <!-- 如果需要数学公式支持 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.min.js"></script>
+    <script>
+      // 添加退出功能
+      document.getElementById("logoutBtn").addEventListener("click", logout);
+
+      // function logout() {
+      //     // 清除本地存储的token
+      //     localStorage.removeItem('token');
+      //     // 清除会话ID
+      //     sessionId = null;
+      //     // 跳转到登录页
+      //     window.location.href = 'login.html';
+      //     alert('已退出登录！');
+      // }移动到script.js中
+
+      // 页面加载时检查token
+      document.addEventListener("DOMContentLoaded", function () {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          window.location.href = "login.html";
+        } else {
+          // 解析token获取用户名
+          try {
+            const payload = JSON.parse(atob(token.split(".")[1]));
+            if (payload.username) {
+              document.getElementById("usernameDisplay").textContent =
+                payload.username;
+            }
+          } catch (e) {
+            console.error("解析token失败", e);
+          }
+
+          // 绑定用户管理按钮事件
+          document
+            .getElementById("userManagementBtn")
+            .addEventListener("click", function () {
+              window.location.href = "users.html";
+            });
+
+          // 在解析token时添加角色检查
+          try {
+            const payload = JSON.parse(atob(token.split(".")[1]));
+            if (payload.username) {
+              document.getElementById("usernameDisplay").textContent =
+                payload.username;
+            }
+
+            // 根据角色显示/隐藏用户管理按钮
+            if (
+              payload.roles &&
+              (payload.roles.includes("ROLE_ROOT") ||
+                payload.roles.includes("ROLE_ADMIN"))
+            ) {
+              document.getElementById("userManagementBtn").style.display =
+                "inline-block";
+            } else {
+              document.getElementById("userManagementBtn").style.display =
+                "none";
+            }
+          } catch (e) {
+            console.error("解析token失败", e);
+          }
+
+          // 绑定退出按钮事件
+          // document.getElementById('logoutBtn').addEventListener('click', logout);
+        }
+        // 获取历史对话
+        fetchHistory();
+
+        // 绑定侧边栏切换按钮
+        document
+          .getElementById("toggleHistory")
+          .addEventListener("click", toggleSidebar);
+        document
+          .getElementById("toggleSidebar")
+          .addEventListener("click", toggleSidebar);
+
+        // 绑定搜索按钮
+        document
+          .getElementById("searchButton")
+          .addEventListener("click", searchHistory);
+        document
+          .getElementById("historySearch")
+          .addEventListener("keypress", function (e) {
+            if (e.key === "Enter") {
+              searchHistory();
+            }
+          });
+      });
+    </script>
+  </body>
+</html>

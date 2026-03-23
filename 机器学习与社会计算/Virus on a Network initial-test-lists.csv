@@ -1,0 +1,7 @@
+"BehaviorSpace results (NetLogo 7.0.2)","Lists version 2.0"
+"Virus on a Network.nlogox"
+"recovery-chance (copy)"
+"12/03/2025 14:27:50:529 +0800"
+"min-pxcor","max-pxcor","min-pycor","max-pycor"
+"-20","20","-20","20"
+"[reporter]","[run number]","initial-outbreak-size","number-of-nodes","average-node-degree","virus-spread-chance","virus-check-frequency","recovery-chance","gain-resistance-chance","[step]"

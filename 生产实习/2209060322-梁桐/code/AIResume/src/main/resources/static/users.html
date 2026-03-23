@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>用户管理</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="style.css">
+    <style>
+
+        body {
+            background: linear-gradient(120deg, #ffd6e0 0%, #ffe3f3 100%);
+        }
+        .user-management {
+            margin-top: 60px;
+            width: 900px;
+            border-radius: 32px;
+            background: #fff0f6;
+            box-shadow: 0 4px 32px rgba(255, 182, 193, 0.18);
+            padding: 32px 24px;
+        }
+        .user-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-top: 20px;
+            background: #fff0f6;
+            box-shadow: 0 2px 12px rgba(255, 182, 193, 0.12);
+            border-radius: 24px;
+            overflow: hidden;
+        }
+        .user-table th, .user-table td {
+            border: none;
+            padding: 16px 14px;
+            text-align: left;
+            font-size: 1.08rem;
+        }
+        .user-table th {
+            background: linear-gradient(90deg, #ffb6c1 0%, #ff69b4 100%);
+            color: white;
+            font-weight: 700;
+            border-radius: 0;
+        }
+        .user-table tr {
+            border-radius: 18px;
+        }
+        .user-table tr:nth-child(even) {
+            background-color: #ffe3f3;
+        }
+        .user-table tr:nth-child(odd) {
+            background-color: #fff0f6;
+        }
+        .action-button {
+            padding: 10px 22px;
+            margin-right: 8px;
+            border: none;
+            border-radius: 24px;
+            cursor: pointer;
+            background: linear-gradient(90deg, #ffb6c1 0%, #ff69b4 100%);
+            color: #fff;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(255, 182, 193, 0.18);
+            transition: background 0.2s, box-shadow 0.2s;
+        }
+        .action-button:hover {
+            background: linear-gradient(90deg, #ff69b4 0%, #ffb6c1 100%);
+            box-shadow: 0 4px 16px rgba(255, 182, 193, 0.22);
+        }
+        .edit-button {
+            background: linear-gradient(90deg, #ffb6c1 0%, #ff69b4 100%);
+            color: #fff;
+        }
+        .delete-button {
+            background: linear-gradient(90deg, #ff8da1 0%, #ff69b4 100%);
+            color: #fff;
+        }
+        .add-user-form {
+            margin-top: 30px;
+            padding: 28px;
+            background: #ffe3f3;
+            border-radius: 24px;
+            box-shadow: 0 2px 12px rgba(255, 182, 193, 0.12);
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ffb6c1;
+            border-radius: 18px;
+            font-size: 1rem;
+            background: #fff0f6;
+            margin-top: 6px;
+            margin-bottom: 12px;
+            transition: border 0.2s, box-shadow 0.2s;
+        }
+        .form-group input:focus, .form-group select:focus {
+            border-color: #ff69b4;
+            box-shadow: 0 0 8px rgba(255, 182, 193, 0.18);
+            outline: none;
+        }
+        .modal-content {
+            background-color: #fff0f6;
+            margin: 10% auto;
+            padding: 28px;
+            border-radius: 24px;
+            width: 400px;
+            box-shadow: 0 4px 32px rgba(255, 182, 193, 0.18);
+        }
+        .close-button {
+            float: right;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #ff69b4;
+            border-radius: 50%;
+            background: #ffe3f3;
+            padding: 2px 10px;
+            transition: background 0.2s;
+        }
+        .close-button:hover {
+            background: #ffb6c1;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1001;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: #fff0f6;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 12px;
+            width: 400px;
+            box-shadow: 0 2px 12px rgba(255, 182, 193, 0.18);
+        }
+
+        .close-button {
+            float: right;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<div class="top-navbar" style="background:linear-gradient(90deg,#ffb6c1 0%,#ff69b4 100%);padding:22px 0;box-shadow:0 4px 16px rgba(255,182,193,0.16);border-radius:0 0 32px 32px;display:flex;justify-content:space-between;align-items:center;">
+    <div class="logo" style="color:#fff;font-size:2.2rem;font-weight:700;letter-spacing:2px;">AI简历分析助手</div>
+    <div class="user-info" style="display:flex;align-items:center;gap:18px;">
+        <span id="usernameDisplay" style="color:#fff;font-weight:500;font-size:1.1rem;">用户</span>
+        <button onclick="window.location.href='index.html'" class="action-button">返回主界面</button>
+        <button id="logoutBtn" class="action-button" style="background:linear-gradient(90deg,#ff8da1 0%,#ff69b4 100%);">退出</button>
+    </div>
+</div>
+
+<div class="user-management">
+    <h1>用户管理</h1>
+
+    <!-- 查询表单 -->
+    <div class="search-form">
+        <input type="text" id="searchUsername" placeholder="用户名">
+        <select id="searchRole">
+            <option value="">所有角色</option>
+            <option value="ROLE_USER">普通用户</option>
+            <option value="ROLE_ADMIN">管理员</option>
+            <option value="ROLE_ROOT">超级管理员</option>
+        </select>
+        <button onclick="searchUsers()">查询</button>
+    </div>
+</div>
+
+<!-- 用户表格 -->
+<table class="user-table">
+    <!-- 表格内容 -->
+</table>
+
+<!-- 分页控件 -->
+<div class="pagination">
+    <button id="prevPage" onclick="changePage(-1)">上一页</button>
+    <span id="currentPage">1</span> / <span id="totalPages">1</span>
+    <button id="nextPage" onclick="changePage(1)">下一页</button>
+    <span>每页显示:</span>
+    <select id="pageSize" onchange="changePageSize()">
+        <option value="5">5</option>
+        <option value="10" selected>10</option>
+        <option value="20">20</option>
+        <option value="50">50</option>
+    </select>
+</div>
+
+    <table class="user-table">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>姓名</th>
+            <th>用户名</th>
+            <th>角色</th>
+            <th>最近登录</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody id="userTableBody">
+        <!-- 用户数据将通过JS动态填充 -->
+        </tbody>
+    </table>
+
+    <div class="add-user-form">
+        <h2>添加新用户</h2>
+        <form id="addUserForm">
+            <div class="form-group">
+                <label for="newName">姓名</label>
+                <input type="text" id="newName" required>
+            </div>
+            <div class="form-group">
+                <label for="newUsername">用户名</label>
+                <input type="text" id="newUsername" required>
+            </div>
+            <div class="form-group">
+                <label for="newPassword">密码</label>
+                <input type="password" id="newPassword" required>
+            </div>
+            <div class="form-group">
+                <label for="newRoles">角色</label>
+                <select id="newRoles" required>
+                    <option value="ROLE_USER">普通用户</option>
+                    <option value="ROLE_ADMIN">管理员</option>
+                    <option value="ROLE_ROOT">超级管理员</option>
+                </select>
+            </div>
+            <button type="submit" class="action-button">添加用户</button>
+        </form>
+    </div>
+</div>
+
+<!-- 编辑用户模态框 -->
+<div id="editUserModal" class="modal">
+    <div class="modal-content">
+        <span class="close-button" onclick="closeEditModal()">&times;</span>
+        <h2>编辑用户</h2>
+        <form id="editUserForm">
+            <input type="hidden" id="editUserId">
+            <div class="form-group">
+                <label for="editName">姓名</label>
+                <input type="text" id="editName" required>
+            </div>
+            <div class="form-group">
+                <label for="editUsername">用户名</label>
+                <input type="text" id="editUsername" required>
+            </div>
+            <div class="form-group">
+                <label for="editPassword">新密码 (留空则不修改)</label>
+                <input type="password" id="editPassword">
+            </div>
+            <div class="form-group">
+                <label for="editRoles">角色</label>
+                <select id="editRoles" required>
+                    <option value="ROLE_USER">普通用户</option>
+                    <option value="ROLE_ADMIN">管理员</option>
+                    <option value="ROLE_ROOT">超级管理员</option>
+                </select>
+            </div>
+            <button type="submit" class="action-button">保存修改</button>
+        </form>
+    </div>
+</div>
+
+<script src="script.js"></script>
+<script>
+    let currentPage = 0;
+    let totalPages = 1;
+    let pageSize = 10;
+    let searchUsername = '';
+    let searchRole = '';
+
+    // 退出登录
+    document.getElementById('logoutBtn').addEventListener('click', logout);
+    // 页面加载时获取用户列表
+    document.addEventListener('DOMContentLoaded', function () {
+        fetchUsers();
+        //显示当前用户
+        const token = localStorage.getItem('token');
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        if (payload.username) {
+            document.getElementById('usernameDisplay').textContent = payload.username;
+        }
+
+        // 绑定添加用户表单
+        document.getElementById('addUserForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            addUser();
+        });
+
+        // 绑定编辑用户表单
+        document.getElementById('editUserForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            updateUser();
+        });
+    });
+
+    // 获取用户列表
+    // 获取用户列表（带分页和查询）
+    async function fetchUsers() {
+        try {
+            const params = new URLSearchParams({
+                page: currentPage,
+                size: pageSize,
+                username: searchUsername,
+                role: searchRole
+            });
+
+            const response = await fetchWithAuth(`http://localhost:8080/api/users/search?${params}`);
+            const data = await response.json();
+
+            // 更新分页信息
+            currentPage = data.currentPage;
+            totalPages = data.totalPages;
+            updatePagination();
+
+            // 渲染用户表格
+            renderUserTable(data.users);
+        } catch (error) {
+            console.error('获取用户列表失败:', error);
+            alert('获取用户列表失败');
+        }
+    }
+
+    // 更新分页控件状态
+    function updatePagination() {
+        document.getElementById('currentPage').textContent = currentPage + 1;
+        document.getElementById('totalPages').textContent = totalPages;
+
+        // 更新按钮状态
+        document.getElementById('prevPage').disabled = currentPage === 0;
+        document.getElementById('nextPage').disabled = currentPage === totalPages - 1;
+    }
+
+    // 执行查询
+    function searchUsers() {
+        searchUsername = document.getElementById('searchUsername').value;
+        searchRole = document.getElementById('searchRole').value;
+        currentPage = 0; // 重置到第一页
+        fetchUsers();
+    }
+
+    // 改变页码
+    function changePage(direction) {
+        const newPage = currentPage + direction;
+        if (newPage >= 0 && newPage < totalPages) {
+            currentPage = newPage;
+            fetchUsers();
+        }
+    }
+
+    // 改变每页显示数量
+    function changePageSize() {
+        pageSize = parseInt(document.getElementById('pageSize').value);
+        currentPage = 0; // 重置到第一页
+        fetchUsers();
+    }
+
+    // 渲染用户表格
+    function renderUserTable(users) {
+        const tableBody = document.getElementById('userTableBody');
+        tableBody.innerHTML = '';
+
+        users.forEach(user => {
+            const row = document.createElement('tr');
+
+            // 格式化登录时间
+            const loginTime = user.resentLoginTime ?
+                new Date(user.resentLoginTime).toLocaleString() : '从未登录';
+
+            row.innerHTML = `
+                    <td>${user.id}</td>
+                    <td>${user.name}</td>
+                    <td>${user.username}</td>
+                    <td>${user.roles}</td>
+                    <td>${loginTime}</td>
+                    <td>
+                        <button class="action-button edit-button" onclick="openEditModal(${user.id})">编辑</button>
+                        <button class="action-button delete-button" onclick="deleteUser(${user.id})">删除</button>
+                    </td>
+                `;
+
+            tableBody.appendChild(row);
+        });
+    }
+
+    // 添加新用户
+    async function addUser() {
+        const newUser = {
+            name: document.getElementById('newName').value,
+            username: document.getElementById('newUsername').value,
+            password: document.getElementById('newPassword').value,
+            roles: document.getElementById('newRoles').value
+        };
+
+        try {
+            const response = await fetchWithAuth('http://localhost:8080/api/users', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(newUser)
+            });
+
+            if (response.ok) {
+                alert('用户添加成功');
+                document.getElementById('addUserForm').reset();
+                fetchUsers(); // 刷新列表
+            } else {
+                alert('添加用户失败: ' + await response.text());
+            }
+        } catch (error) {
+            console.error('添加用户失败:', error);
+            alert('添加用户失败');
+        }
+    }
+
+    // 打开编辑模态框
+    async function openEditModal(userId) {
+        try {
+            // 获取用户信息
+            const response = await fetchWithAuth(`http://localhost:8080/api/users/${userId}`);
+            const user = await response.json();
+
+            // 填充表单
+            document.getElementById('editUserId').value = user.id;
+            document.getElementById('editName').value = user.name;
+            document.getElementById('editUsername').value = user.username;
+            document.getElementById('editRoles').value = user.roles;
+
+            // 显示模态框
+            document.getElementById('editUserModal').style.display = 'block';
+        } catch (error) {
+            console.error('获取用户信息失败:', error);
+            alert('获取用户信息失败');
+        }
+    }
+
+    // 关闭编辑模态框
+    function closeEditModal() {
+        document.getElementById('editUserModal').style.display = 'none';
+    }
+
+    // 更新用户信息
+    async function updateUser() {
+        const userId = document.getElementById('editUserId').value;
+        const updatedUser = {
+            id: parseInt(userId),
+            name: document.getElementById('editName').value,
+            username: document.getElementById('editUsername').value,
+            password: document.getElementById('editPassword').value,
+            roles: document.getElementById('editRoles').value
+        };
+
+        try {
+            const response = await fetchWithAuth(`http://localhost:8080/api/users/${userId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(updatedUser)
+            });
+
+            if (response.ok) {
+                alert('用户信息更新成功');
+                closeEditModal();
+                fetchUsers(); // 刷新列表
+            } else {
+                alert('更新用户失败: ' + await response.text());
+            }
+        } catch (error) {
+            console.error('更新用户失败:', error);
+            alert('更新用户失败');
+        }
+    }
+
+    // 删除用户
+    async function deleteUser(userId) {
+        if (!confirm('确定要删除这个用户吗？此操作不可撤销。')) return;
+
+        try {
+            const response = await fetchWithAuth(`http://localhost:8080/api/users/${userId}`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                alert('用户删除成功');
+                if (document.getElementById('userTableBody').children.length === 1 && currentPage > 0) {
+                    currentPage--;
+                }
+                fetchUsers(); // 刷新列表
+            } else {
+                alert('删除用户失败: ' + await response.text());
+            }
+        } catch (error) {
+            console.error('删除用户失败:', error);
+            alert('删除用户失败');
+        }
+    }
+</script>
+</body>
+</html>

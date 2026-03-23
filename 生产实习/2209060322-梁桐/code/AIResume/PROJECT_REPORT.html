@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AIResume 项目报告</title>
+  <style>
+    :root { --fg:#111; --bg:#fff; --muted:#666; --primary:#0b5fff; }
+    html,body { margin:0; padding:0; background:var(--bg); color:var(--fg); font:16px/1.6 -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif; }
+    .container { max-width: 900px; margin: 40px auto; padding: 0 16px; }
+    h1 { font-size: 28px; margin: 0 0 12px; }
+    h2 { font-size: 20px; margin: 28px 0 8px; border-left: 3px solid var(--primary); padding-left: 8px; }
+    ul { margin: 8px 0 16px 22px; }
+    code, pre { background:#f6f8fa; border-radius:6px; }
+    pre { padding:12px; overflow:auto; }
+    .muted { color: var(--muted); }
+    .toc a { color: var(--primary); text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+    @media print { a[href]:after { content: ""; } }
+  </style>
+  <meta name="description" content="AIResume 项目背景、技术选型、功能分析、技术亮点、部署、安全、测试与改进建议的完整报告。">
+</head>
+<body>
+  <div class="container">
+    <h1>AIResume 项目报告</h1>
+    <p class="muted">本页可直接在浏览器中“打印为 PDF”。</p>
+
+    <div class="toc">
+      <h2>目录</h2>
+      <ol>
+        <li><a href="#bg">项目背景</a></li>
+        <li><a href="#tech">技术选型</a></li>
+        <li><a href="#arch">系统架构</a></li>
+        <li><a href="#features">功能分析</a></li>
+        <li><a href="#apis">接口与示例</a></li>
+        <li><a href="#highlights">技术亮点</a></li>
+        <li><a href="#deploy">部署与运行</a></li>
+        <li><a href="#security">安全与合规</a></li>
+        <li><a href="#perf">性能与扩展</a></li>
+        <li><a href="#quality">测试与质量</a></li>
+        <li><a href="#risks">风险与改进</a></li>
+        <li><a href="#appendix">附录</a></li>
+      </ol>
+    </div>
+
+    <h2 id="bg">1. 项目背景</h2>
+    <ul>
+      <li>项目名称：AIResume</li>
+      <li>定位：面向求职者/HR 的 AI 简历分析与智能对话服务。</li>
+      <li>目标：解析 PDF/Word 简历，结构化关键信息；结合上下文进行多轮对话；可切换 DeepSeek/文心千帆等模型。</li>
+      <li>受众：个人求职者、HR、职业咨询服务机构。</li>
+    </ul>
+
+    <h2 id="tech">2. 技术选型</h2>
+    <ul>
+      <li>后端：Spring Boot 3.5.5（Java 17）、Spring MVC、Spring Data JPA、MyBatis</li>
+      <li>数据库：MySQL 8.x</li>
+      <li>安全：JWT、拦截器 + 自定义权限注解</li>
+      <li>AI 接入：DeepSeek、文心千帆（可热切换）</li>
+      <li>文档处理：Apache PDFBox、Apache POI</li>
+      <li>构建：Maven</li>
+    </ul>
+
+    <h2 id="arch">3. 系统架构</h2>
+    <ul>
+      <li>分层：Controller / Service / Repository &amp; Mapper / Utils</li>
+      <li>关键模块：鉴权与权限、对话与会话、简历分析、用户管理与日志</li>
+      <li>典型流程：登录签发 JWT → 上传简历 → 解析结果入上下文 → 对话融合上下文 → 退出落库会话历史。</li>
+    </ul>
+
+    <h2 id="features">4. 功能分析</h2>
+    <ul>
+      <li>认证与注册：/login、/register，签发含 username、roles 的 JWT。</li>
+      <li>权限控制：全局拦截，方法级 @RequirePermission；/analyze 需 ROLE_ADMIN|ROLE_ROOT。</li>
+      <li>对话能力：/chat 自动创建或继续会话，拼接简历上下文，选择 DeepSeek/文心生成回复。</li>
+      <li>简历分析：支持 PDF/Word 上传解析，抽取关键点并回填对话上下文。</li>
+      <li>用户管理：CRUD 与分页检索；关键操作写审计日志。</li>
+    </ul>
+
+    <h2 id="apis">5. 接口与示例</h2>
+    <p>详见项目根目录的 <code>API.md</code>（覆盖认证/对话/简历分析/用户管理，含请求/响应示例与错误码）。</p>
+
+    <h2 id="highlights">6. 技术亮点</h2>
+    <ul>
+      <li>可插拔多模型路由（AiService 抽象 + 运行时切换）。</li>
+      <li>上下文增强提示工程（简历解析结果 + 会话历史）。</li>
+      <li>声明式权限（注解 + 拦截器）。</li>
+      <li>JPA 与 MyBatis 混合数据访问。</li>
+      <li>线程安全用户上下文（ThreadLocal 注入）。</li>
+      <li>预留流式输出能力（SSE/流式响应）。</li>
+    </ul>
+
+    <h2 id="deploy">7. 部署与运行</h2>
+    <ul>
+      <li>依赖：JDK 17、MySQL、Maven</li>
+      <li>配置：application.properties（端口、DB、AI URL/Key、文件大小限制、CORS）</li>
+      <li>启动：mvn spring-boot:run 或运行 AiResumeApplication 主类</li>
+      <li>建议：生产使用环境变量/密钥管家注入敏感配置</li>
+    </ul>
+
+    <h2 id="security">8. 安全与合规</h2>
+    <ul>
+      <li>敏感信息不入库：AI Key/DB 口令改为环境变量或密钥管理服务。</li>
+      <li>JWT：稳定签名密钥（或 RS256），支持轮转；合理过期与刷新。</li>
+      <li>密码：BCrypt 存储。</li>
+      <li>校验与异常：引入 Hibernate Validator 与全局异常处理器。</li>
+    </ul>
+
+    <h2 id="perf">9. 性能与扩展</h2>
+    <ul>
+      <li>外部大模型调用关键链路：建议缓存、超时重试、熔断与限流。</li>
+      <li>会话历史分页与归档；可引入 Redis/消息队列。</li>
+      <li>前端可用 SSE/WebSocket 获取流式回复。</li>
+    </ul>
+
+    <h2 id="quality">10. 测试与质量</h2>
+    <ul>
+      <li>单元：UserService、ResumeService、AiService Mock。</li>
+      <li>集成：登录鉴权、权限注解、简历上传解析、对话流程。</li>
+      <li>安全：CORS、日志脱敏、错误回显最小化。</li>
+    </ul>
+
+    <h2 id="risks">11. 风险与改进</h2>
+    <ul>
+      <li>配置与密钥：改用环境变量/密钥服务；移除仓库明文。</li>
+      <li>统一返回：标准响应模型与错误码枚举；完善 @ControllerAdvice。</li>
+      <li>观测性：结构化日志、Tracing、指标与告警。</li>
+      <li>体验：对话结果流式输出；AI 服务降级与兜底回答。</li>
+    </ul>
+
+    <h2 id="appendix">12. 附录</h2>
+    <ul>
+      <li>代码入口：<code>com.airesume.AiResumeApplication</code></li>
+      <li>关键文档：<code>arch.md</code>、<code>API.md</code></li>
+    </ul>
+  </div>
+</body>
+</html>
+
+

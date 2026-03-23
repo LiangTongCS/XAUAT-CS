@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.airesume.mapper.SessionMapper">
+
+    <resultMap id="sessionResultMap" type="com.airesume.pojo.Session">
+        <id property="id" column="s_id"/>
+        <result property="sessionId" column="s_session_id"/>
+        <result property="username" column="user_name"/>
+        <result property="resumeResult" column="resume_result"/>
+        <result property="startTime" column="start_time"/>
+        <collection property="contentList" ofType="com.airesume.pojo.SessionContent">
+            <id property="id" column="sc_id"/>
+            <result property="sessionId" column="sc_session_id"/>
+            <result property="role" column="sc_role"/>
+            <result property="content" column="sc_content"/>
+        </collection>
+    </resultMap>
+
+    <insert id="insertContent">
+
+            INSERT INTO session_content (session_id, role, content)
+                VALUES
+            <foreach collection="contentList" item="content" separator=",">
+                (#{content.sessionId}, #{content.role}, #{content.content})
+            </foreach>
+
+    </insert>
+
+    <select id="selectSession" resultMap="sessionResultMap">
+        SELECT
+            s.id AS s_id,
+            s.session_id AS s_session_id,
+            s.user_name,
+            s.resume_result,
+            s.start_time,
+            sc.id AS sc_id,
+            sc.session_id AS sc_session_id,
+            sc.role AS sc_role,
+            sc.content AS sc_content
+        FROM session s
+                 LEFT JOIN session_content sc ON s.session_id = sc.session_id
+        WHERE s.session_id = #{sessionId}
+    </select>
+
+</mapper>
